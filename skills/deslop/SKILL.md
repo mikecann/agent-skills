@@ -36,6 +36,7 @@ Read [style.md](style.md) first. That file is the source of truth for the style 
 - Never change behavior. This is a style pass, not a refactor.
 - If a style rule conflicts with preserving behavior, preserving behavior wins.
 - Prefer small, local edits over wide rewrites.
+- If the code only becomes meaningfully cleaner after a deeper architectural refactor, stop and say so instead of forcing deslop beyond its scope.
 - Skip generated files, vendor code, build output, and lockfiles.
 - Skip tests unless the user asked to include them.
 - Skip any rule when applying it would make the code harder to read.
@@ -55,6 +56,7 @@ Read [style.md](style.md) first. That file is the source of truth for the style 
 - smaller orchestration functions with extracted helpers
 - query/data gathering separated from action/side effects
 - function names that describe side effects honestly
+- overloaded hooks or components split with small pure helpers
 - object parameters instead of long positional argument lists
 - exhaustive handling for discriminated unions
 - React render branches flattened with early returns

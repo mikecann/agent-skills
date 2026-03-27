@@ -18,6 +18,10 @@ Each fixture lives in its own directory under `fixtures/` and contains:
 - `input.ts` or `input.tsx`
 - `notes.md`
 
+Larger seed projects live under `projects/` and are used for project-scale
+evals where multiple agents evolve the same codebase over time before `deslop`
+is run against it.
+
 The notes file explains:
 
 - what the skill should improve

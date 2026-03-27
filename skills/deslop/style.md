@@ -11,6 +11,7 @@ Use this file as an execution guide, not just a list of preferences.
 - Skip a rule if applying it would make the code harder to understand.
 - Preserve public APIs unless the user explicitly asked for broader refactoring.
 - Preserve exported TypeScript function signatures unless the user explicitly asked for API or typing changes.
+- If the real fix is architectural rather than stylistic, stop and surface that instead of forcing a pseudo-cleanup.
 - Prefer self-documenting code over explanatory comments.
 
 ## Apply In This Order
@@ -67,6 +68,7 @@ function getStatus(user?: User) {
 - Prefer short, focused functions, roughly 20 lines or fewer.
 - Break large functions into smaller, self-contained helpers with descriptive names.
 - Prefer small orchestration functions that read like a list of steps.
+- When one hook, component, or module starts owning multiple concerns, extract the smallest helpful helpers first.
 - Split large files into smaller modules by concern when that makes the code easier to scan.
 - Use whitespace to separate meaningful chunks of logic.
 - Use comments sparingly. If a comment explains confusing code, prefer simplifying the code.
@@ -169,6 +171,7 @@ async function getUserById(id: string) {
 - Separate "determine something" functions from "do something" functions when practical.
 - If one function both decides and acts, consider splitting it.
 - If a function name hides a side effect, rename it or extract the side effect.
+- In large functions or hooks, extract pure helpers for derived values, labels, filtering, sorting, or mapping before extracting new stateful units.
 - Use destructured object parameters when a function takes several related inputs.
 - Return an object when returning multiple values.
 - Use array methods like `map`, `filter`, and `reduce` when they improve clarity.
@@ -202,6 +205,25 @@ async function checkOrderAndLog(orderId: string) {
   if (status === "missing") logger.error("Order missing");
   return status;
 }
+```
+
+```ts
+// Bad: one hook owns filtering, searching, sorting, and labels inline
+const visibleItems = useMemo(() => {
+  const filtered = items.filter((item) => item.status === filter);
+  if (!query) return filtered;
+  return filtered.filter((item) => item.title.includes(query));
+}, [items, filter, query]);
+
+const summary = `Showing ${filter} items for ${query || "all queries"}`;
+
+// Good: extract the pure helpers, keep the hook API the same
+const visibleItems = useMemo(
+  () => getVisibleItems({ items, filter, query }),
+  [items, filter, query],
+);
+
+const summary = getSummaryLabel({ filter, query });
 ```
 
 ```ts
@@ -335,6 +357,7 @@ Only apply this section in React or TSX files.
 - Use inline event handlers when the logic is simple and only used once.
 - Only hoist handlers or use `useCallback` when the handler is reused or referential stability is a measured issue.
 - Create helper functions only when the logic is reused.
+- In larger components, extract static maps and pure label builders when they reduce render noise.
 - Use React context to avoid prop drilling when that makes the tree easier to follow.
 - Push data fetching and mutations down into leaf app-specific components when that makes the component tree easier to follow.
 - Prefer fluent promises inline in mutation handlers when the logic is local and one-off.
