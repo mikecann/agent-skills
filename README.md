@@ -1,4 +1,4 @@
-# Mike Cann's Agent Skills
+# Mikes's Skills
 
 My personal agent skills repo.
 
