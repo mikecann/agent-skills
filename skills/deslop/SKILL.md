@@ -48,7 +48,7 @@ Read [style.md](style.md) first. That file is the source of truth for the style 
 - Guard clauses instead of nested conditionals
 - `if` plus early return instead of `else`
 - `const` instead of `let` when there is no reassignment
-- explicit checks instead of `!` non-null assertions
+- narrowing or direct removal instead of `!` non-null assertions
 - `Boolean(value)` or explicit comparisons instead of `!!value`
 - clearer boolean names like `isOpen`, `hasItems`, `canRetry`
 - shorter functions with one clear job
@@ -59,6 +59,7 @@ Read [style.md](style.md) first. That file is the source of truth for the style 
 - exhaustive handling for discriminated unions
 - React render branches flattened with early returns
 - inline JSX handlers when the logic is only used once
+- keep handlers hoisted when they are reused in multiple places
 
 ## Bad vs good
 

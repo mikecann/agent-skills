@@ -31,7 +31,7 @@ Apply these first because they are the most common AI slop patterns:
 - Remove `else` blocks that follow a `return`, `throw`, or other early exit.
 - Change `let` to `const` when there is no reassignment.
 - Replace `!!value` with `Boolean(value)` or an explicit comparison.
-- Replace `value!` non-null assertions with an explicit check.
+- Replace `value!` non-null assertions with safer typing or narrowing.
 - Remove braces from single-line `if`, `return`, or `throw` when readability improves.
 - Rename vague or misleading names.
 
@@ -235,6 +235,8 @@ Only apply this section in TypeScript code.
 - Model variants with discriminated unions using the field name `kind`.
 - Handle discriminated unions exhaustively.
 - When making union handling exhaustive, preserve the existing behavior of each branch.
+- Prefer narrowing or removing `!` directly over adding new runtime checks.
+- Add an explicit runtime check only when it is needed for correctness or typing and still preserves behavior.
 - Use an `exhaustiveCheck()` helper when it improves certainty and readability.
 - Throw informative errors with useful context, not generic messages.
 - Prefer inference by default. Add explicit annotations when they make the code clearer or avoid type complexity later.
@@ -285,11 +287,23 @@ function getCount(result: any) {
   return result.items!.length;
 }
 
-// Good: preserve the public signature during a style-only pass
+// Good: preserve the public signature and runtime behavior
 function getCount(result: any) {
-  if (!result.items)
-    throw new TypeError("Cannot read properties of undefined (reading 'length')");
   return result.items.length;
+}
+```
+
+```ts
+// Bad: non-null assertion where control-flow narrowing is available
+function getUserName(user: User | null) {
+  if (!user) return "Anonymous";
+  return user!.name;
+}
+
+// Good: use narrowing, no runtime change needed
+function getUserName(user: User | null) {
+  if (!user) return "Anonymous";
+  return user.name;
 }
 ```
 
@@ -370,6 +384,24 @@ export function SaveButton() {
       Save
     </button>
   );
+}
+```
+
+```tsx
+// Good: keep a shared handler hoisted when reused
+export function RetryPanel({ hasError }: { hasError: boolean }) {
+  const handleRetry = () => {
+    saveDraft()
+      .then(() => toast.success("Saved"))
+      .catch(() => toast.error("Failed"));
+  };
+
+  return hasError ? (
+    <>
+      <ErrorBanner onRetry={handleRetry} />
+      <button onClick={handleRetry}>Retry</button>
+    </>
+  ) : null;
 }
 ```
 
