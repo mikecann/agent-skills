@@ -45,6 +45,7 @@ In Windsurf:
 Current skills in this repo:
 
 - `deslop` - second-pass code cleanup and simplification
+- `ship` - create or find a PR, watch checks, handle automated review comments, and drive it to merge-ready
 
 ## Skill Philosophy
 
