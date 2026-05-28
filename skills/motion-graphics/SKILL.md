@@ -35,8 +35,8 @@ Every clip the skill produces is:
 Before scaffolding or any other work, confirm a script exists in the video folder.
 
 1. List `.md` files in the video folder (top level only, not in subfolders).
-2. If exactly one `.md` file is found, treat it as the script and confirm the filename with the user.
-3. If multiple `.md` files are found, ask the user which one is the script.
+2. If exactly one `.md` file is found, **silently use it** as the script. Do not ask the user to confirm — they already pointed you at this folder.
+3. If multiple `.md` files are found, ask the user which one is the script (genuine ambiguity, can't guess).
 4. If **none** is found, **stop immediately**. Tell the user verbatim:
    > I couldn't find a `.md` script in `<folder>`. Either drop the script there as a `.md` file, or paste the script content in chat now and I'll save it to `<folder>/script.md`.
 
@@ -82,12 +82,8 @@ The script often references URLs (docs, blog posts, tldraw boards, GitHub repos,
 1. Scan `script.md` for URLs (markdown links, bare URLs, "see X" references). **Ignore URLs inside `<aside>` blocks** — those belong to the user's editor-side B-roll, not the clips this skill generates. Exception: if you've decided to propose a clip immediately adjacent to an aside and the URL inside the aside genuinely supports that clip's visual, treat it as load-bearing and fetch it.
 2. For each URL that's plausibly visual or referential context (not just a citation), attempt `WebFetch`.
 3. **If fetch returns meaningful content** (article text, README, diagram description), keep it as context for clip design.
-4. **If fetch fails or returns nothing useful** (auth-walled, client-rendered SPA like tldraw/Figma/Excalidraw, 404), **stop and ask the user**:
-   > I can't access `<url>` — it looks like a `<reason: client-rendered board / auth-walled / 404>`. Options:
-   > - Export the content as a PNG/SVG and drop it in `<video-folder>/refs/`, then tell me the filename.
-   > - Describe what's on it in chat.
-   > - Skip it if it's not load-bearing for the clips.
-5. Save any fetched text context to `motion-graphics/refs/<slug>.md` and any user-provided images to `motion-graphics/refs/`. Reference these in clip notes files.
+4. **If fetch fails or returns nothing useful** (auth-walled, client-rendered SPA like tldraw/Figma/Excalidraw, 404), **log the URL to `motion-graphics/refs/blocked-urls.md`** with a one-line note of why it failed, then continue. Do not pause to ask. If the user later notices a clip is missing visual context that URL would have provided, they'll bring it up in revision.
+5. Save any fetched text context to `motion-graphics/refs/<slug>.md`. Reference these in clip notes files.
 
 If no URLs are present or none need fetching, skip this phase and move on.
 
@@ -111,14 +107,14 @@ Parse `script.md` and produce a candidate clip list. **The bar is illustrative v
 - **Conversational filler** — "anyways", "let me explain", "okay so".
 - **Sections where the spoken words are the whole point** — a personal story, a joke, a meta-comment about the video. Audio-only is correct here.
 
-**Present the proposed list** to the user as a table. Each entry:
+**Announce the proposed list** to the user as a table, then proceed straight to Phase 5. Do not pause for approval — the user picks variants after the renders are done, not before, because they need to see the clips to react usefully. Each entry:
 
 - clip id (`clip-01`, `clip-02`, ...) — these are also the Remotion composition IDs (see Phase 5 for naming rules).
 - 1-2 lines of the script section it covers (quoted)
 - one-line visual concept
 - estimated duration in seconds (based on natural read time — see Phase 5 step 4)
 
-Ask: anything to add, drop, or rephrase? Wait for explicit approval before generating.
+If the user wants to redirect mid-flight (e.g. "drop clip-04, add one for the X paragraph"), they'll say so when they see the list. Otherwise, keep moving.
 
 ### Phase 5 — Generate 3 variants per approved clip
 
@@ -162,10 +158,7 @@ For each approved clip:
    ```
    The user can hold the final frame longer in their editor, but the clip shouldn't run longer than the spoken section.
 
-   **Long clips (>15s):** if the formula yields more than ~15 seconds, pause and ask the user before generating:
-   > This section reads as `<N>` seconds. Should I (a) make one long clip with phased animation, (b) split it into 2-3 shorter clips, or (c) accept the long single clip?
-   
-   Default suggestion is (b) — splitting — because a 20s+ motion graphic is hard to design as a single cohesive piece and is usually two ideas wearing a trenchcoat.
+   **Long clips (>15s):** if the formula yields more than ~15 seconds, generate as one long clip with phased animation (e.g. multiple staggered reveals). Do not pause to ask. Flag the duration in the clip notes file so it's visible. If the user wants to split it, they'll say so in revision after seeing the rendered result — a 20s+ motion graphic is sometimes two ideas wearing a trenchcoat, but that's a judgement easier to make from the rendered output than from the script.
 5. Register all 3 variants in `src/Root.tsx` as `<Composition>` entries with `width={3840} height={2160} fps={30}`. Composition `id` props must use dashes only:
    ```tsx
    <Composition id="clip-01-a" component={Clip01IntroA} durationInFrames={120} ... />
@@ -330,10 +323,10 @@ export const ClipGood = () => {
 - [ ] Remotion project scaffolded under `motion-graphics/`
 - [ ] official Remotion skill installed in the project
 - [ ] theme.ts + STYLE.md copied from this skill into the project
-- [ ] URLs in the script were fetched (or the user was asked) before clip proposal
+- [ ] URLs in the script were fetched; blockers logged to `refs/blocked-urls.md` and the workflow continued
 - [ ] `<aside>` blocks were treated as editor notes and *not* turned into clips
 - [ ] every proposed clip passes the "does a visual actually help here?" test
-- [ ] proposed clip list reviewed with the user before any rendering
+- [ ] clip list was announced to the user but the workflow proceeded without pausing for approval
 - [ ] composition IDs in `Root.tsx` use dashes only (no underscores)
 - [ ] `durationInFrames` per clip matches natural read time of the script section
 - [ ] every clip has 3 meaningfully distinct variants (or a clear note saying fewer made sense)
