@@ -29,12 +29,15 @@ export const fonts = {
   display: 'GeistSans, Inter, system-ui, sans-serif',
   body: 'GeistSans, Inter, system-ui, sans-serif',
   mono: 'GeistMono, "JetBrains Mono", "Fira Code", monospace',
+  // Sizes are tuned for mobile-first viewing. Source is 4K but most viewers
+  // see the final video at 720p or lower on a ~6-inch phone, so the on-screen
+  // pixel count is much smaller than the canvas implies. When in doubt: bigger.
   sizes: {
-    headline: 140,
-    title: 96,
-    body: 56,
-    caption: 36,
-    code: 48,
+    headline: 210,
+    title: 144,
+    body: 84,
+    caption: 54,
+    code: 72,
   },
 } as const;
 

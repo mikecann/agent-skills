@@ -21,10 +21,12 @@ These clips overlay a tech-explainer voiceover for the Convex YouTube channel. T
 
 ## Type
 
-- Display headlines are big (`fonts.sizes.headline` = 140px at 4K). Use sparingly — one headline per clip max.
-- Body text is small relative to the canvas. 4K is a huge surface; readable text is smaller than you think.
+**Mobile-first sizing.** The clips render at 4K but most viewers watch on YouTube at 720p or lower, often on a ~6-inch phone. A 56px font at 4K becomes ~28px at 1080p which is ~14px on a phone — the floor for legibility. The `fonts.sizes` tokens are pre-tuned for this; use them as-is or larger. **When in doubt, go bigger.** 4K is misleading — Remotion Studio's huge preview canvas tricks you into making text too small.
+
+- Display headlines (`fonts.sizes.headline`) sparingly — one per clip max.
 - Monospace (`fonts.mono`) for code only. Never for body.
 - The typography tokens are exported as `fonts` (not `type`) to avoid shadowing the TypeScript `type` keyword. Import as `import { colors, fonts, motion } from '../theme'`.
+- **Mobile sanity check while designing**: imagine the rendered MP4 shrunk to thumbnail size in a YouTube grid. If the on-screen text disappears, redesign — use fewer words and bigger type. Less text per clip is almost always the right move.
 
 ## Motion
 
