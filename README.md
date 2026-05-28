@@ -45,6 +45,7 @@ In Windsurf:
 Current skills in this repo:
 
 - `deslop` - second-pass code cleanup and simplification
+- `motion-graphics` - generate silent MP4 motion-graphic clips for a tech-explainer video from a markdown script using Remotion
 - `ship` - create or find a PR, watch checks, handle automated review comments, and drive it to merge-ready
 
 ## Skill Philosophy
