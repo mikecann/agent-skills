@@ -5,8 +5,9 @@ description: Create short hand-drawn cartoon B-roll clips for Mike's tech-explai
 
 # Mike Cartoon B-Roll
 
-Create short, silent cartoon inserts that break up talking-head footage. Use one
-strong opening frame, then give the video model room to invent the progression.
+Create short cartoon inserts that break up talking-head footage. Use one strong
+opening frame, then give the video model room to invent the progression and
+scene-appropriate audio.
 
 ## Style
 
@@ -66,12 +67,13 @@ supports the narration. It does not need to illustrate every sentence.
 6. Wait for approval. If the user explicitly asks to skip approval, proceed after
    the same internal frame check.
 7. Generate directly from each start frame. Do not create or supply a last frame.
-8. Play each full result at normal speed and inspect a dense filmstrip. Reject
-   identity drift, duplicated props, broken anatomy, camera jumps, or style drift.
+8. Play each full result with audio at normal speed and inspect a dense filmstrip.
+   Reject identity drift, duplicated props, broken anatomy, camera jumps, style
+   drift, severe audio glitches, or unrequested speech.
 9. Never silently pay for a retry. Preserve the failed take and state the retry
    cost.
-10. Normalize each generated output to silent H.264 at the agreed native
-    resolution and 30fps. Write the video as
+10. Normalize each generated output to H.264 video at the agreed native
+    resolution and 30fps, preserving the generated audio as AAC. Write it as
     `<VIDEO>/source/generated/<video-filename>.mp4`, where `<VIDEO>` is the video
     project root and `<video-filename>` exactly matches the approval block. Create
     `source/generated` if it does not exist.
@@ -103,12 +105,13 @@ Never put frames, prompts, raw provider files, or receipts in `source/generated`
 - Resolution: native 1080p
 - Duration: six seconds, or eight seconds for two beats
 - Aspect ratio: 16:9
-- Audio: disabled
+- Audio: generated
 - Jobs: sequential unless the user explicitly requests parallel generation
 
-Use `scripts/openrouter-video.mjs` to fetch live pricing and cap every paid job.
-Do not rely on remembered prices. Use Veo only when the user prefers lower cost
-or faster generation.
+Use `scripts/openrouter-video.mjs` with `--audio` to fetch live pricing and cap
+every paid job. Do not rely on remembered prices. Use `--no-audio` only when the
+user explicitly requests a silent clip. Use Veo only when the user prefers lower
+cost or faster generation.
 
 Example motion brief:
 
@@ -120,8 +123,9 @@ satisfying understated ending.
 
 Preserve the warm paper, ink-and-watercolor texture, existing subjects, and
 existing props. Static camera, one continuous shot, restrained hand-drawn
-motion. No cuts, unrequested characters, duplicated objects, generated text,
-flat vector simplification, 3D rendering, watermark, or audio.
+motion. Generate subtle natural sound effects that match the visible action, but
+no speech unless requested. No cuts, unrequested characters, duplicated objects,
+generated text, flat vector simplification, 3D rendering, or watermark.
 ```
 
 ## Checklist
@@ -137,8 +141,9 @@ flat vector simplification, 3D rendering, watermark, or audio.
 - [ ] The motion brief gives direction without choreographing every moment.
 - [ ] No last frame is supplied.
 - [ ] Live model, duration, resolution, audio setting, and cost are confirmed.
-- [ ] The complete motion is watched before delivery.
-- [ ] The final is silent H.264 at the agreed native resolution and 30fps.
+- [ ] The complete motion and audio are reviewed before delivery.
+- [ ] The final is H.264 at the agreed native resolution and 30fps with generated
+      audio preserved as AAC.
 - [ ] The output video is saved to
       `<VIDEO>/source/generated/<video-filename>.mp4`.
 - [ ] The response links to the absolute `source/generated` folder.

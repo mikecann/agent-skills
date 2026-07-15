@@ -48,7 +48,7 @@ const loadOpenRouterKey = () => {
 };
 
 const parseArgs = (values) => {
-  const args = { audio: false };
+  const args = { audio: true };
   for (let index = 0; index < values.length; index += 1) {
     const value = values[index];
     if (value === "--audio") {
