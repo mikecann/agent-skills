@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mike Cartoon B-Roll"
+  short_description: "Create cartoon B-roll from one start frame"
+  default_prompt: "Use $mike-cartoon-broll to create a cartoon B-roll clip from one approved-style start frame and a loose motion brief."

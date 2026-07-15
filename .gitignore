@@ -1,3 +1,5 @@
 # Scratch space for dogfooding skills against real inputs.
 # Each subfolder is a one-off test run; nothing here is canonical.
 test-runs/
+.env
+.DS_Store
