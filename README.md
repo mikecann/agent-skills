@@ -46,6 +46,7 @@ Current skills in this repo:
 
 - `deslop` - second-pass code cleanup and simplification
 - `mike-cartoon-broll` - generate approved-style cartoon B-roll from one raster start frame and a loose motion brief
+- `mike-convex-thumbnail` - generate Mike-style YouTube thumbnail concepts and drafts for Convex videos
 - `motion-graphics` - generate silent MP4 motion-graphic clips for a tech-explainer video from a markdown script using Remotion
 - `ship` - create or find a PR, watch checks, handle automated review comments, and drive it to merge-ready
 

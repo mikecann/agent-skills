@@ -6,6 +6,9 @@ description:
   logo assets. Use when the user asks for thumbnails, YouTube thumbnails, video
   thumb options, or a thumbnail like the Convex static hosting "NO DASHBOARDS"
   example.
+compatibility:
+  Designed for Mike's macOS workstation with Google Drive for desktop and
+  Convex brand assets in ~/Assets/Images.
 ---
 
 # Mike Convex Thumbnail
@@ -32,8 +35,9 @@ model, Mike's local cutout photos, and local Convex brand assets.
 ## Core Workflow
 
 1. Inspect the available local references before prompting the image model:
-   - Run `scripts/check-local-assets.ps1` from this skill if the paths may have
-     moved.
+   - Run `bash scripts/check-local-assets.sh` from this skill. It discovers the
+     Google Drive account folder and prints absolute paths for the photo and
+     brand assets.
    - Use `view_image` on at least one Mike headshot and the Convex symbol before
      calling the image model.
 2. If the user provided a script, Notion page, or video brief, extract the main
@@ -54,17 +58,18 @@ model, Mike's local cutout photos, and local Convex brand assets.
 
 Use these current local paths on Mike's machine:
 
-| Purpose                                   | Path                                                                                         |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Mike cutout photo folder                  | `G:\My Drive\Personal\Photos of Me\convex\Backgrounds Removed`                               |
-| Primary Convex symbol                     | `C:\Users\mikec\Assets\Images\symbol-color (1).png`                                          |
-| Convex color logo                         | `C:\Users\mikec\Assets\Images\logo-color.png`                                                |
-| Convex white wordmark                     | `C:\Users\mikec\Assets\Images\wordmark-white.png`                                            |
-| Convex white symbol                       | `C:\Users\mikec\Assets\Images\symbol-white.png`                                              |
-| Static hosting liked reference screenshot | `C:\Users\mikec\AppData\Local\Temp\codex-clipboard-2e3ea2e2-5464-460f-86f3-f4c4bcd6f731.png` |
+| Purpose                   | Path                                                                                                                                |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Mike cutout photo folder  | `~/Library/CloudStorage/GoogleDrive-mike.cann@gmail.com/My Drive/Personal/Photos of Me/convex/Backgrounds Removed`                  |
+| Primary Convex symbol     | `~/Assets/Images/symbol-color (1).png`                                                                                              |
+| Convex color logo         | `~/Assets/Images/logo-color.png`                                                                                                    |
+| Convex white wordmark     | `~/Assets/Images/wordmark-white.png`                                                                                                |
+| Convex white symbol       | `~/Assets/Images/symbol-white.png`                                                                                                  |
+| Static hosting reference  | `references/static-hosting-thumbnail.md`                                                                                            |
 
-The temp screenshot path may disappear. If it is missing, recreate the concept
-from the recipe in `references/static-hosting-thumbnail.md`.
+The Google Drive account folder can change. Use the absolute paths printed by
+`scripts/check-local-assets.sh` instead of guessing or passing a literal `~` to
+an image tool.
 
 ## Preferred Mike References
 
