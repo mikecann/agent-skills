@@ -28,6 +28,10 @@ the reference controls rendering only, not scene content.
 - If the friendly robot appears, use its rounded weathered teal body, cream face
   panel, black oval eyes, mustard antenna ball and chest medallion, and segmented
   dark limbs.
+- If Mike's dog Sammy appears, draw a chocolate labrador with a dark collar.
+- The robot stands only for the viewer's coding agent. Never cast it as the
+  database, a function, the computer, or a scheduled job; use objects or other
+  characters for those roles.
 
 ## Preserve Meaning
 
@@ -80,6 +84,25 @@ inside a required setting, but it must not replace that setting or practice.
   roles, or comparisons must be shown separately for the meaning to survive.
 - Never exceed eight seconds unless the user explicitly asks.
 
+## Motion and Continuity
+
+Video models over-animate and lose spatial logic. Write the motion brief to
+prevent it:
+
+- Ask for one brief gesture, then relaxed natural motion. A gesture named in the
+  prompt is otherwise often held for the whole clip (a point that never ends).
+- Keep animals calm and slow. An animal given a task tends to go frantic.
+- State depth explicitly for anything that overlaps: "the fence stands in front
+  of the rake", "the kangaroo passes behind the armchair". The model otherwise
+  guesses, and often puts foreground props behind characters.
+- Do not try to time a gesture to a narration word in the brief. Place the clip
+  so it starts just before the word, then trim or speed it so the gesture peaks
+  on it.
+- When a clip must match another shot (same room, chair, lighting), make its
+  start frame by image-editing that shot's own frame ("replace the man with a
+  kangaroo"), not by generating the scene again. Separately generated rooms
+  drift in colour, framing, and props, and a cut or dissolve between them jumps.
+
 ## Workflow
 
 1. Split the request into one item for every script segment or explicit part the
@@ -91,7 +114,8 @@ inside a required setting, but it must not replace that setting or practice.
    cause, result, setting, and change.
 4. For every item, generate the 16:9 raster start frame and draft the loose motion
    brief in parallel from the same anchors. Use the bundled reference for visual
-   style only. Let the video model choose the exact timing, reactions, and ending.
+   style only. Let the video model choose the exact timing and reactions, and
+   the ending unless the clip must end on a known state (step 8).
 5. Inspect the returned frame at full resolution. Fix identity, anatomy,
    object-count, fake-text, or composition problems. Reconcile the frame and
    motion brief against both the anchors and each other. Regenerate the frame if
@@ -113,19 +137,30 @@ inside a required setting, but it must not replace that setting or practice.
    per clip, and total cost once. Do not bury the approval bundle in extra prose.
 7. Wait for approval. If the user explicitly asks to skip approval, proceed after
    the same internal frame check.
-8. Generate directly from each start frame. Do not create or supply a last frame.
+8. Generate from each start frame. Supply a last frame only when the clip must
+   end on a known state, such as matching the next shot or leaving an empty set.
+   Make that last frame by image-editing the start frame so the scene matches,
+   and pass it with `--last-frame`; the script refuses it if the model does not
+   support one.
 9. Review each full result visually at normal speed and inspect a dense filmstrip.
-   Reject identity drift, duplicated props, broken anatomy, camera jumps, or
-   style drift. Do not gate delivery or retry on generated audio; preserve it for
-   editing.
-10. Never silently pay for a retry. Preserve the failed take and state the retry
-   cost.
-11. Normalize each generated output to H.264 video at the agreed native
+   Reject identity drift, duplicated props, broken anatomy, camera jumps, style
+   drift, held gestures, frantic motion, or wrong depth order.
+10. Check the generated audio for speech. The model sometimes invents voices,
+    names, or gibberish. Mute a clip with speech; muting is free and matches a
+    silent regeneration. Regenerate with `--no-audio` only when the take needs
+    redoing anyway, and state the cost. Otherwise preserve the audio for editing.
+11. Never silently pay for a retry. Preserve the failed take and state the retry
+    cost.
+12. When the user flags a problem in a delivered clip, fix that problem first
+    with a trim, speed change, crop, or in-place video edit, and regenerate only
+    if that fails. Ask before replacing a clip the user has already approved;
+    replacements can lose what they liked about the original.
+13. Normalize each generated output to H.264 video at the agreed native
     resolution and 30fps, preserving the generated audio as AAC. Write it as
     `<VIDEO>/source/generated/<video-filename>.mp4`, where `<VIDEO>` is the video
     project root and `<video-filename>` exactly matches the approval block. Create
     `source/generated` if it does not exist.
-12. After generation, give the user a clickable Markdown link to the absolute
+14. After generation, give the user a clickable Markdown link to the absolute
     `<VIDEO>/source/generated` folder so they can open it in Finder and view the
     videos.
 
@@ -158,8 +193,20 @@ Never put frames, prompts, raw provider files, or receipts in `source/generated`
 
 Use `scripts/openrouter-video.mjs` with `--audio` to fetch live pricing and cap
 every paid job. Do not rely on remembered prices. Use `--no-audio` only when the
-user explicitly requests a silent clip. Use Veo only when the user prefers lower
+user requests a silent clip or a take with invented speech is being regenerated
+anyway (step 10). Use Veo only when the user prefers lower
 cost or faster generation.
+
+Other OpenRouter video models worth knowing (checked September 2026; confirm
+live capabilities with the models endpoint before relying on them):
+
+| Model | Use for | Notes |
+|---|---|---|
+| `bytedance/seedance-2.5` | Shots that need character or prop consistency | Takes many reference images. 720p maximum on OpenRouter. |
+| `runway/aleph-2` | Fixing one thing in a delivered clip without regenerating it (step 12) | Needs the source as a public HTTPS `video_url`; `scripts/openrouter-video.mjs` does not support video input yet. |
+| `black-forest-labs/flux-video-edit` | Cheap in-place edits to a B-roll clip | Redrew a face in one test, so avoid it on clips with Mike. Outputs 1248x704 at 24fps, so it needs the step 13 normalisation. Do not send `aspect_ratio`. |
+| `kwaivgi/kling-v3.0-pro` | Clips that keep over-animating | Has `negative_prompt` and `cfg_scale` for restraining motion. 720p. |
+
 
 Example motion brief:
 
@@ -194,9 +241,15 @@ generated text, flat vector simplification, 3D rendering, or watermark.
 - [ ] Each frame and motion brief were reconciled against the semantic anchors.
 - [ ] Every requested segment has its own approval block with `Preserves:`.
 - [ ] The motion brief gives direction without choreographing every moment.
-- [ ] No last frame is supplied.
+- [ ] The motion brief asks for one brief gesture, calm animals, and explicit
+      depth order where things overlap.
+- [ ] A clip that must match another shot starts from an edit of that shot's
+      frame.
+- [ ] A last frame is supplied only for continuity, made from the start frame.
 - [ ] Live model, duration, resolution, audio setting, and cost are confirmed.
 - [ ] The complete motion is reviewed visually before delivery.
+- [ ] The generated audio was checked for speech, and any clip with speech was
+      muted or regenerated.
 - [ ] The final is H.264 at the agreed native resolution and 30fps with generated
       audio preserved as AAC.
 - [ ] The output video is saved to
